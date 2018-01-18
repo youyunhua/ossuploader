@@ -3,7 +3,7 @@ package org.st.aliyun.ossuploader;
 import org.st.aliyun.ossuploader.model.DbInfo;
 import org.st.aliyun.ossuploader.model.OssInfo;
 
-public class Sqilte2OssUploader implements OssUploader {
+public class Sqilte2OssUploader extends AbstractOssUploader {
 	
 	public Sqilte2OssUploader(DbInfo dbInfo, OssInfo ossInfo) {
 		this.dbInfo = dbInfo;

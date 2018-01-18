@@ -1,6 +1,7 @@
 package org.st.aliyun.ossuploader;
 
 import java.io.File;
+import java.util.Objects;
 
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.builder.fluent.Configurations;
@@ -13,11 +14,9 @@ import org.st.aliyun.ossuploader.util.Utils;
 public class App 
 {
 	public static Configuration config = null;
-	private static Logger logger = Logger.getLogger(App.class
-			.getName());
+	private static Logger logger = Logger.getLogger(App.class.getName());
 	
-    public static void main( String[] args )
-    {
+    public static void main( String[] args ) {
         logger.info("ossuploader begin.");
         
         Configurations configs = new Configurations(); 
@@ -39,14 +38,14 @@ public class App
         	return;
         }
         
-        OssUploader uploader = App.getUploader(dbType);
+        AbstractOssUploader uploader = App.getUploader(dbType);
         uploader.run();
         
         logger.info("ossuploader end.");
     }
 
-	private static OssUploader getUploader(String dbType) {
-		OssUploader uploader = null;
+	private static AbstractOssUploader getUploader(String dbType) {
+		AbstractOssUploader uploader = null;
 		
 		DbInfo dbInfo = new DbInfo();
 		dbInfo.setName(config.getString("db.name"));
@@ -55,7 +54,7 @@ public class App
 		dbInfo.setValueField(config.getString("db.valueField"));
 		dbInfo.setBeginKeyListIndex(config.getInt("db.beginKeyListIndex"));
 		dbInfo.setEndKeyListIndex(config.getInt("db.endKeyListIndex"));
-		dbInfo.setIsSkipBadRecords(config.getBoolean("db.skipBadRecords"));
+		dbInfo.setSkipBadRecords(config.getBoolean("db.skipBadRecords"));
 		
 		OssInfo ossInfo = new OssInfo();
 		ossInfo.setEndpoint(config.getString("oss.endpoint"));
@@ -67,7 +66,7 @@ public class App
 		ossInfo.setKey(config.getString("oss.key"));
 		ossInfo.setSecret(config.getString("oss.secret"));
 		
-		if (dbType.equals("sqlite")) {
+		if (Objects.equals(dbType, "sqlite")) {
 			uploader = new Sqilte2OssUploader(dbInfo, ossInfo);
 		}
 		
