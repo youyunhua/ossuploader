@@ -32,6 +32,7 @@ public class SqliteReadTask implements Callable<Integer> {
 
 	@Override
 	public Integer call() throws Exception {
+		logger.info("ReadSqliteTask begin.");
 		Connection connection = null;
 		try {
 			connection = DriverManager.getConnection("jdbc:sqlite:" + this.dbInfo.getName());
@@ -53,7 +54,8 @@ public class SqliteReadTask implements Callable<Integer> {
 			}
 			UploadObject uploadObject = null;
 			Long totalReadSize = 0L;
-			do {
+			int totalReadCount = 0;
+			while (rs.next() && (id < endReadId || endReadId < 0)) {
 				try {
 					String tileKey = rs.getString(KEY_FIELD);
 					byte[] tileData = rs.getBytes(DATA_FIELD);
@@ -68,8 +70,9 @@ public class SqliteReadTask implements Callable<Integer> {
 					AbstractOssUploader.uploadObjectStatusMap.put(id, UploadObjectStatus.ReadFailed);
 				} finally {
 					++id;
+					++totalReadCount;
 				}
-			} while (rs.next() && (id < endReadId || endReadId < 0));
+			} ;
 
 			UploadTask poisonPillTask = UploadTasks.newUploadTask(UploadConstants.UPLOAD_OBJECT_POISON_PILL, 
 					this.uploadTaskClass);
@@ -78,7 +81,7 @@ public class SqliteReadTask implements Callable<Integer> {
 			this.uploadResult.setCurrentReadId(id);
 			this.uploadResult.setTotalReadSize(totalReadSize);
 			logger.info("ReadSqliteTask over. currentReadId=" + id + ", totalReadSize=" + totalReadSize);
-			return id;
+			return totalReadCount;
 		} catch (SQLException e) {
 			logger.error("ReadSqliteTask error. errorCode=" + e.getErrorCode() + 
 					", msg=" + e.getMessage());

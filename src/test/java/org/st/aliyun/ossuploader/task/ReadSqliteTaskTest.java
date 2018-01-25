@@ -1,4 +1,4 @@
-package org.st.aliyun.ossuploader;
+package org.st.aliyun.ossuploader.task;
 
 import static org.junit.Assert.*;
 
@@ -18,11 +18,15 @@ import org.junit.Test;
 import org.st.aliyun.ossuploader.model.DbInfo;
 import org.st.aliyun.ossuploader.model.OssInfo;
 import org.st.aliyun.ossuploader.model.UploadObject;
+import org.st.aliyun.ossuploader.model.UploadResult;
 import org.st.aliyun.ossuploader.task.OssUploadTask;
 import org.st.aliyun.ossuploader.task.SqliteReadTask;
 import org.st.aliyun.ossuploader.task.UploadTask;
 
 public class ReadSqliteTaskTest {
+
+	private static final String TEST_SQLITE = "test.sqlite";
+	private static final int TEST_SQLITE_DATA_COUNT = 270;
 
 	@Test(expected = SQLException.class)
 	public void testCall_dbNotExist() throws Exception {
@@ -60,7 +64,7 @@ public class ReadSqliteTaskTest {
 
 	@Test(expected = SQLException.class)
 	public void testCall_keyFieldNotExist() throws Exception {
-		String testDbFileName = "test.sqlite";
+		String testDbFileName = TEST_SQLITE;
 		assertTrue(new File(testDbFileName).exists());
 		DbInfo dbInfo = new DbInfo();
 		dbInfo.setTable("GMAP_Data");
@@ -73,7 +77,7 @@ public class ReadSqliteTaskTest {
 	
 	@Test(expected = SQLException.class)
 	public void testCall_valueFieldNotExist() throws Exception {
-		String testDbFileName = "test.sqlite";
+		String testDbFileName = TEST_SQLITE;
 		assertTrue(new File(testDbFileName).exists());
 		DbInfo dbInfo = new DbInfo();
 		dbInfo.setTable("GMAP_Data");
@@ -86,7 +90,7 @@ public class ReadSqliteTaskTest {
 
 	@Test
 	public void testCall_traverse() throws Exception {
-		String testDbFileName = "test.sqlite";
+		String testDbFileName = TEST_SQLITE;
 		assertTrue(new File(testDbFileName).exists());
 		DbInfo dbInfo = new DbInfo();
 		dbInfo.setTable("GMAP_Data");
@@ -94,13 +98,13 @@ public class ReadSqliteTaskTest {
 		dbInfo.setValueField("Data");
 		dbInfo.setName(testDbFileName);
 		ExecutorService uploadExecutor = Executors.newSingleThreadExecutor();
-		SqliteReadTask task = new SqliteReadTask(dbInfo, null, uploadExecutor, PrintUploadTask.class);
+		SqliteReadTask task = new SqliteReadTask(dbInfo, new UploadResult(), uploadExecutor, PrintUploadTask.class);
 		task.call();
 	}
 
 	@Test
 	public void testCall_readCount() throws Exception {
-		String testDbFileName = "test.sqlite";
+		String testDbFileName = TEST_SQLITE;
 		assertTrue(new File(testDbFileName).exists());
 		DbInfo dbInfo = new DbInfo();
 		dbInfo.setTable("GMAP_Data");
@@ -108,9 +112,27 @@ public class ReadSqliteTaskTest {
 		dbInfo.setValueField("Data");
 		dbInfo.setName(testDbFileName);
 		ExecutorService uploadExecutor = Executors.newSingleThreadExecutor();
-		SqliteReadTask task = new SqliteReadTask(dbInfo, null, uploadExecutor, EmptyUploadTask.class);
+		SqliteReadTask task = new SqliteReadTask(dbInfo, new UploadResult(), uploadExecutor, EmptyUploadTask.class);
 		Integer readCount = task.call();
-		Assert.assertEquals(readCount.intValue(), 271);
+		Assert.assertEquals(readCount.intValue(), TEST_SQLITE_DATA_COUNT);
+	}
+
+	@Test
+	public void testCall_readCountSkipSome() throws Exception {
+		String testDbFileName = TEST_SQLITE;
+		assertTrue(new File(testDbFileName).exists());
+		DbInfo dbInfo = new DbInfo();
+		dbInfo.setTable("GMAP_Data");
+		dbInfo.setKeyField("Id");
+		dbInfo.setValueField("Data");
+		dbInfo.setName(testDbFileName);
+		final int SKIP_COUNT = 10;
+		UploadResult uploadResult = new UploadResult();
+		uploadResult.setCurrentReadId(SKIP_COUNT);
+		ExecutorService uploadExecutor = Executors.newSingleThreadExecutor();
+		SqliteReadTask task = new SqliteReadTask(dbInfo, uploadResult, uploadExecutor, EmptyUploadTask.class);
+		Integer readCount = task.call();
+		Assert.assertEquals(readCount.intValue(), TEST_SQLITE_DATA_COUNT - SKIP_COUNT);
 	}
 
 //	@Test

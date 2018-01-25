@@ -1,4 +1,4 @@
-package org.st.aliyun.ossuploader;
+package org.st.aliyun.ossuploader.task;
 
 import org.st.aliyun.ossuploader.model.UploadObject;
 import org.st.aliyun.ossuploader.task.UploadTask;
