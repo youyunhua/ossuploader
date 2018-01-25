@@ -57,7 +57,8 @@ public class UploadResultManager {
 		
 		TreeSet<Integer> ids = uploadResult.getReadButNotUploadIds();
 		if (ids == null || ids.isEmpty()) {
-			return uploadResult.getCurrentReadId();
+			Integer curReadId = uploadResult.getCurrentReadId();
+			return curReadId == null ? 0 : curReadId;
 		}
 		
 		return ids.first();
