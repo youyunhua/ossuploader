@@ -52,9 +52,6 @@ public class App
 		dbInfo.setTable(config.getString("db.table"));
 		dbInfo.setKeyField(config.getString("db.keyField"));
 		dbInfo.setValueField(config.getString("db.valueField"));
-		dbInfo.setBeginKeyListIndex(config.getInt("db.beginKeyListIndex"));
-		dbInfo.setEndKeyListIndex(config.getInt("db.endKeyListIndex"));
-		dbInfo.setSkipBadRecords(config.getBoolean("db.skipBadRecords"));
 		
 		OssInfo ossInfo = new OssInfo();
 		ossInfo.setEndpoint(config.getString("oss.endpoint"));

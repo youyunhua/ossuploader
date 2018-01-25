@@ -8,17 +8,6 @@ public class DbInfo {
     private String keyField;
     private String valueField;
     
-    private Integer beginKeyListIndex;
-    private Integer endKeyListIndex;
-    private Boolean skipBadRecords;
-    
-	@Override
-	public String toString() {
-		return "DbInfo [name=" + name + ", host=" + host + ", port=" + port + ", table=" + table + ", keyField="
-				+ keyField + ", valueField=" + valueField + ", beginKeyListIndex=" + beginKeyListIndex
-				+ ", endKeyListIndex=" + endKeyListIndex + ", skipBadRecords=" + skipBadRecords + "]";
-	}
-
 	public String getName() {
 		return name;
 	}
@@ -66,30 +55,66 @@ public class DbInfo {
 	public void setValueField(String valueField) {
 		this.valueField = valueField;
 	}
-	
-	public Integer getBeginKeyListIndex() {
-		return beginKeyListIndex;
-	}
-	
-	public void setBeginKeyListIndex(Integer beginKeyListIndex) {
-		this.beginKeyListIndex = beginKeyListIndex;
-	}
-	
-	public Integer getEndKeyListIndex() {
-		return endKeyListIndex;
-	}
-	
-	public void setEndKeyListIndex(Integer endKeyListIndex) {
-		this.endKeyListIndex = endKeyListIndex;
-	}
-	
-	public Boolean getSkipBadRecords() {
-		return skipBadRecords;
-	}
-	
-	public void setSkipBadRecords(Boolean skipBadRecords) {
-		this.skipBadRecords = skipBadRecords;
+
+	@Override
+	public String toString() {
+		return "DbInfo [name=" + name + ", host=" + host + ", port=" + port + ", table=" + table + ", keyField="
+				+ keyField + ", valueField=" + valueField + "]";
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((host == null) ? 0 : host.hashCode());
+		result = prime * result + ((keyField == null) ? 0 : keyField.hashCode());
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + ((port == null) ? 0 : port.hashCode());
+		result = prime * result + ((table == null) ? 0 : table.hashCode());
+		result = prime * result + ((valueField == null) ? 0 : valueField.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DbInfo other = (DbInfo) obj;
+		if (host == null) {
+			if (other.host != null)
+				return false;
+		} else if (!host.equals(other.host))
+			return false;
+		if (keyField == null) {
+			if (other.keyField != null)
+				return false;
+		} else if (!keyField.equals(other.keyField))
+			return false;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
+			return false;
+		if (port == null) {
+			if (other.port != null)
+				return false;
+		} else if (!port.equals(other.port))
+			return false;
+		if (table == null) {
+			if (other.table != null)
+				return false;
+		} else if (!table.equals(other.table))
+			return false;
+		if (valueField == null) {
+			if (other.valueField != null)
+				return false;
+		} else if (!valueField.equals(other.valueField))
+			return false;
+		return true;
+	}
 
 }
