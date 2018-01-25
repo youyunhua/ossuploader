@@ -52,10 +52,12 @@ public class SqliteReadTask implements Callable<Integer> {
 				}
 			}
 			UploadObject uploadObject = null;
+			Long totalReadSize = 0L;
 			do {
 				try {
 					String tileKey = rs.getString(KEY_FIELD);
 					byte[] tileData = rs.getBytes(DATA_FIELD);
+					totalReadSize += tileData.length;
 					uploadObject = new UploadObject(id, tileKey, tileData);
 					AbstractOssUploader.uploadObjectStatusMap.put(id, UploadObjectStatus.ReadNotUpload);
 					
@@ -73,7 +75,9 @@ public class SqliteReadTask implements Callable<Integer> {
 					this.uploadTaskClass);
 			this.uploadExecutor.submit(poisonPillTask);
 
-			logger.info("ReadSqliteTask over. ");
+			this.uploadResult.setCurrentReadId(id);
+			this.uploadResult.setTotalReadSize(totalReadSize);
+			logger.info("ReadSqliteTask over. currentReadId=" + id + ", totalReadSize=" + totalReadSize);
 			return id;
 		} catch (SQLException e) {
 			logger.error("ReadSqliteTask error. errorCode=" + e.getErrorCode() + 
