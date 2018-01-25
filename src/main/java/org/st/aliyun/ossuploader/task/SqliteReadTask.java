@@ -15,6 +15,7 @@ import org.st.aliyun.ossuploader.UploadResultManager;
 import org.st.aliyun.ossuploader.AbstractOssUploader.UploadObjectStatus;
 import org.st.aliyun.ossuploader.constant.UploadConstants;
 import org.st.aliyun.ossuploader.model.DbInfo;
+import org.st.aliyun.ossuploader.model.OssInfo;
 import org.st.aliyun.ossuploader.model.UploadObject;
 import org.st.aliyun.ossuploader.model.UploadResult;
 
@@ -22,12 +23,18 @@ public class SqliteReadTask implements Callable<Integer> {
 
 	private static Logger logger = Logger.getLogger(SqliteReadTask.class.getName());
 
+//	public SqliteReadTask(DbInfo dbInfo, UploadResult uploadResult, 
+//			ExecutorService uploadExecutor, Class<?> uploadTaskClass) {
+//		this(dbInfo, uploadResult, uploadExecutor, uploadTaskClass, null);
+//	}
+
 	public SqliteReadTask(DbInfo dbInfo, UploadResult uploadResult, 
-			ExecutorService uploadExecutor, Class<?> uploadTaskClass) {
+			ExecutorService uploadExecutor, Class<?> uploadTaskClass, OssInfo ossInfo) {
 		this.dbInfo = dbInfo;
 		this.uploadResult = uploadResult;
 		this.uploadExecutor = uploadExecutor;
 		this.uploadTaskClass = uploadTaskClass;
+		this.ossInfo = ossInfo;
 	}
 
 	@Override
@@ -63,7 +70,8 @@ public class SqliteReadTask implements Callable<Integer> {
 					uploadObject = new UploadObject(id, tileKey, tileData);
 					AbstractOssUploader.uploadObjectStatusMap.put(id, UploadObjectStatus.ReadNotUpload);
 					
-					UploadTask uploadTask = UploadTasks.newUploadTask(uploadObject, this.uploadTaskClass);
+					UploadTask uploadTask = UploadTasks.newUploadTask(uploadObject, this.ossInfo,
+							this.uploadTaskClass);
 					this.uploadExecutor.submit(uploadTask);
 				} catch (SQLException e) {
 					logger.error(id + ": ReadSqliteTask get data error.", e);
@@ -75,7 +83,7 @@ public class SqliteReadTask implements Callable<Integer> {
 			} ;
 
 			UploadTask poisonPillTask = UploadTasks.newUploadTask(UploadConstants.UPLOAD_OBJECT_POISON_PILL, 
-					this.uploadTaskClass);
+					this.ossInfo, this.uploadTaskClass);
 			this.uploadExecutor.submit(poisonPillTask);
 
 			this.uploadResult.setCurrentReadId(id);
@@ -98,4 +106,5 @@ public class SqliteReadTask implements Callable<Integer> {
 	private UploadResult uploadResult;
 	private ExecutorService uploadExecutor;
 	private Class<?> uploadTaskClass;
+	private OssInfo ossInfo;
 }

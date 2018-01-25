@@ -62,6 +62,8 @@ public class App
 		ossInfo.setPrefix(config.getString("oss.prefix"));
 		ossInfo.setKey(config.getString("oss.key"));
 		ossInfo.setSecret(config.getString("oss.secret"));
+		ossInfo.setMaxConnections(config.getInteger("oss.maxConnections", 100));
+		ossInfo.setMaxErrorRetry(config.getInteger("oss.maxErrorRetry", 10));
 		
 		if (Objects.equals(dbType, "sqlite")) {
 			uploader = new Sqilte2OssUploader(dbInfo, ossInfo);

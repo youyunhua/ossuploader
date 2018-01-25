@@ -35,7 +35,7 @@ public class Sqilte2OssUploader extends AbstractOssUploader {
 			ExecutorService uploadExecutor = Executors.newFixedThreadPool(nThreads);
 			
 			SqliteReadTask readTask = new SqliteReadTask(this.dbInfo, uploadResult
-					, uploadExecutor, OssUploadTask.class);
+					, uploadExecutor, OssUploadTask.class, this.ossInfo);
 			Future<Integer> readCount = readExecutor.submit(readTask);
 			
 			logger.info("readCount=" + readCount.get());

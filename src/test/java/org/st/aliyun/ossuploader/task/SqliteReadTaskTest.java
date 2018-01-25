@@ -23,7 +23,7 @@ import org.st.aliyun.ossuploader.task.OssUploadTask;
 import org.st.aliyun.ossuploader.task.SqliteReadTask;
 import org.st.aliyun.ossuploader.task.UploadTask;
 
-public class ReadSqliteTaskTest {
+public class SqliteReadTaskTest {
 
 	private static final String TEST_SQLITE = "test.sqlite";
 	private static final int TEST_SQLITE_DATA_COUNT = 270;
@@ -33,7 +33,7 @@ public class ReadSqliteTaskTest {
 		String notExistDbFileName = "xx:\\_xxx\\__xxx.sqlite";
 		DbInfo dbInfo = new DbInfo();
 		dbInfo.setName(notExistDbFileName);
-		SqliteReadTask task = new SqliteReadTask(dbInfo, null, null, null);
+		SqliteReadTask task = new SqliteReadTask(dbInfo, null, null, null, null);
 		task.call();
 	}
 
@@ -45,7 +45,7 @@ public class ReadSqliteTaskTest {
 			assertFalse(new File(notExistDbFileName).exists());
 			DbInfo dbInfo = new DbInfo();
 			dbInfo.setName(notExistDbFileName);
-			SqliteReadTask task = new SqliteReadTask(dbInfo, null, null, null);
+			SqliteReadTask task = new SqliteReadTask(dbInfo, null, null, null, null);
 			task.call();
 		} finally {
 			Files.deleteIfExists(Paths.get(notExistDbFileName));
@@ -58,7 +58,7 @@ public class ReadSqliteTaskTest {
 		assertTrue(new File(testDbFileName).exists());
 		DbInfo dbInfo = new DbInfo();
 		dbInfo.setName(testDbFileName);
-		SqliteReadTask task = new SqliteReadTask(dbInfo, null, null, null);
+		SqliteReadTask task = new SqliteReadTask(dbInfo, null, null, null, null);
 		task.call();
 	}
 
@@ -71,7 +71,7 @@ public class ReadSqliteTaskTest {
 		dbInfo.setKeyField("Id_xxx");
 		dbInfo.setValueField("Data");
 		dbInfo.setName(testDbFileName);
-		SqliteReadTask task = new SqliteReadTask(dbInfo, null, null, null);
+		SqliteReadTask task = new SqliteReadTask(dbInfo, null, null, null, null);
 		task.call();
 	}
 	
@@ -84,7 +84,7 @@ public class ReadSqliteTaskTest {
 		dbInfo.setKeyField("Id");
 		dbInfo.setValueField("Data_xxx");
 		dbInfo.setName(testDbFileName);
-		SqliteReadTask task = new SqliteReadTask(dbInfo, null, null, null);
+		SqliteReadTask task = new SqliteReadTask(dbInfo, null, null, null, null);
 		task.call();
 	}
 
@@ -98,7 +98,8 @@ public class ReadSqliteTaskTest {
 		dbInfo.setValueField("Data");
 		dbInfo.setName(testDbFileName);
 		ExecutorService uploadExecutor = Executors.newSingleThreadExecutor();
-		SqliteReadTask task = new SqliteReadTask(dbInfo, new UploadResult(), uploadExecutor, PrintUploadTask.class);
+		SqliteReadTask task = new SqliteReadTask(dbInfo, new UploadResult(), uploadExecutor, 
+				PrintUploadTask.class, null);
 		task.call();
 	}
 
@@ -112,7 +113,8 @@ public class ReadSqliteTaskTest {
 		dbInfo.setValueField("Data");
 		dbInfo.setName(testDbFileName);
 		ExecutorService uploadExecutor = Executors.newSingleThreadExecutor();
-		SqliteReadTask task = new SqliteReadTask(dbInfo, new UploadResult(), uploadExecutor, EmptyUploadTask.class);
+		SqliteReadTask task = new SqliteReadTask(dbInfo, new UploadResult(), uploadExecutor, 
+				EmptyUploadTask.class, null);
 		Integer readCount = task.call();
 		Assert.assertEquals(readCount.intValue(), TEST_SQLITE_DATA_COUNT);
 	}
@@ -130,7 +132,8 @@ public class ReadSqliteTaskTest {
 		UploadResult uploadResult = new UploadResult();
 		uploadResult.setCurrentReadId(SKIP_COUNT);
 		ExecutorService uploadExecutor = Executors.newSingleThreadExecutor();
-		SqliteReadTask task = new SqliteReadTask(dbInfo, uploadResult, uploadExecutor, EmptyUploadTask.class);
+		SqliteReadTask task = new SqliteReadTask(dbInfo, uploadResult, uploadExecutor, 
+				EmptyUploadTask.class, null);
 		Integer readCount = task.call();
 		Assert.assertEquals(readCount.intValue(), TEST_SQLITE_DATA_COUNT - SKIP_COUNT);
 	}

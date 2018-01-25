@@ -1,11 +1,13 @@
 package org.st.aliyun.ossuploader.task;
 
+import org.st.aliyun.ossuploader.model.OssInfo;
 import org.st.aliyun.ossuploader.model.UploadObject;
 
 public class PrintUploadTask extends EmptyUploadTask {
 
-	public PrintUploadTask(UploadObject uploadObject) {
-		super(uploadObject);
+
+	public PrintUploadTask(UploadObject uploadObject, OssInfo ossInfo) {
+		super(uploadObject, ossInfo);
 	}
 
 	@Override
