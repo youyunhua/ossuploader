@@ -4,6 +4,8 @@ public class DbInfo {
     private String name;
 	private String host;
 	private Integer port;
+	private String user;
+	private String password;
     private String table;
     private String keyField;
     private String valueField;
@@ -56,10 +58,20 @@ public class DbInfo {
 		this.valueField = valueField;
 	}
 
-	@Override
-	public String toString() {
-		return "DbInfo [name=" + name + ", host=" + host + ", port=" + port + ", table=" + table + ", keyField="
-				+ keyField + ", valueField=" + valueField + "]";
+	public String getUser() {
+		return user;
+	}
+
+	public void setUser(String user) {
+		this.user = user;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
 	}
 
 	@Override
@@ -71,6 +83,7 @@ public class DbInfo {
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		result = prime * result + ((port == null) ? 0 : port.hashCode());
 		result = prime * result + ((table == null) ? 0 : table.hashCode());
+		result = prime * result + ((user == null) ? 0 : user.hashCode());
 		result = prime * result + ((valueField == null) ? 0 : valueField.hashCode());
 		return result;
 	}
@@ -109,12 +122,23 @@ public class DbInfo {
 				return false;
 		} else if (!table.equals(other.table))
 			return false;
+		if (user == null) {
+			if (other.user != null)
+				return false;
+		} else if (!user.equals(other.user))
+			return false;
 		if (valueField == null) {
 			if (other.valueField != null)
 				return false;
 		} else if (!valueField.equals(other.valueField))
 			return false;
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "DbInfo [name=" + name + ", host=" + host + ", port=" + port + ", user=" + user + ", password="
+				+ password + ", table=" + table + ", keyField=" + keyField + ", valueField=" + valueField + "]";
 	}
 
 }
