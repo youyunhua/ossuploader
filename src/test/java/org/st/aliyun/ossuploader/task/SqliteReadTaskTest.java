@@ -15,6 +15,7 @@ import java.util.concurrent.Executors;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.st.aliyun.ossuploader.Context;
 import org.st.aliyun.ossuploader.model.DbInfo;
 import org.st.aliyun.ossuploader.model.OssInfo;
 import org.st.aliyun.ossuploader.model.UploadObject;
@@ -33,7 +34,8 @@ public class SqliteReadTaskTest {
 		String notExistDbFileName = "xx:\\_xxx\\__xxx.sqlite";
 		DbInfo dbInfo = new DbInfo();
 		dbInfo.setName(notExistDbFileName);
-		SqliteReadTask task = new SqliteReadTask(dbInfo, null, null, null, null);
+		Context context = new ContextMock(dbInfo, null, null, null, null, null);
+		SqliteReadTask task = new SqliteReadTask(context);
 		task.call();
 	}
 
@@ -45,7 +47,8 @@ public class SqliteReadTaskTest {
 			assertFalse(new File(notExistDbFileName).exists());
 			DbInfo dbInfo = new DbInfo();
 			dbInfo.setName(notExistDbFileName);
-			SqliteReadTask task = new SqliteReadTask(dbInfo, null, null, null, null);
+			Context context = new ContextMock(dbInfo, null, null, null, null, null);
+			SqliteReadTask task = new SqliteReadTask(context);
 			task.call();
 		} finally {
 			Files.deleteIfExists(Paths.get(notExistDbFileName));
@@ -58,7 +61,8 @@ public class SqliteReadTaskTest {
 		assertTrue(new File(testDbFileName).exists());
 		DbInfo dbInfo = new DbInfo();
 		dbInfo.setName(testDbFileName);
-		SqliteReadTask task = new SqliteReadTask(dbInfo, null, null, null, null);
+		Context context = new ContextMock(dbInfo, null, null, null, null, null);
+		SqliteReadTask task = new SqliteReadTask(context);
 		task.call();
 	}
 
@@ -71,7 +75,8 @@ public class SqliteReadTaskTest {
 		dbInfo.setKeyField("Id_xxx");
 		dbInfo.setValueField("Data");
 		dbInfo.setName(testDbFileName);
-		SqliteReadTask task = new SqliteReadTask(dbInfo, null, null, null, null);
+		Context context = new ContextMock(dbInfo, null, null, null, null, null);
+		SqliteReadTask task = new SqliteReadTask(context);
 		task.call();
 	}
 	
@@ -84,7 +89,8 @@ public class SqliteReadTaskTest {
 		dbInfo.setKeyField("Id");
 		dbInfo.setValueField("Data_xxx");
 		dbInfo.setName(testDbFileName);
-		SqliteReadTask task = new SqliteReadTask(dbInfo, null, null, null, null);
+		Context context = new ContextMock(dbInfo, null, null, null, null, null);
+		SqliteReadTask task = new SqliteReadTask(context);
 		task.call();
 	}
 
@@ -98,8 +104,9 @@ public class SqliteReadTaskTest {
 		dbInfo.setValueField("Data");
 		dbInfo.setName(testDbFileName);
 		ExecutorService uploadExecutor = Executors.newSingleThreadExecutor();
-		SqliteReadTask task = new SqliteReadTask(dbInfo, new UploadResult(), uploadExecutor, 
-				PrintUploadTask.class, null);
+		Context context = new ContextMock(dbInfo, null, new UploadResult(), null, 
+				uploadExecutor, PrintUploadTask.class);
+		SqliteReadTask task = new SqliteReadTask(context);
 		task.call();
 	}
 
@@ -113,8 +120,9 @@ public class SqliteReadTaskTest {
 		dbInfo.setValueField("Data");
 		dbInfo.setName(testDbFileName);
 		ExecutorService uploadExecutor = Executors.newSingleThreadExecutor();
-		SqliteReadTask task = new SqliteReadTask(dbInfo, new UploadResult(), uploadExecutor, 
-				EmptyUploadTask.class, null);
+		Context context = new ContextMock(dbInfo, null, new UploadResult(), null, 
+				uploadExecutor, EmptyUploadTask.class);
+		SqliteReadTask task = new SqliteReadTask(context);
 		Integer readCount = task.call();
 		Assert.assertEquals(readCount.intValue(), TEST_SQLITE_DATA_COUNT);
 	}
@@ -132,8 +140,9 @@ public class SqliteReadTaskTest {
 		UploadResult uploadResult = new UploadResult();
 		uploadResult.setCurrentReadId(SKIP_COUNT);
 		ExecutorService uploadExecutor = Executors.newSingleThreadExecutor();
-		SqliteReadTask task = new SqliteReadTask(dbInfo, uploadResult, uploadExecutor, 
-				EmptyUploadTask.class, null);
+		Context context = new ContextMock(dbInfo, null, uploadResult, null, 
+				uploadExecutor, EmptyUploadTask.class);
+		SqliteReadTask task = new SqliteReadTask(context);
 		Integer readCount = task.call();
 		Assert.assertEquals(readCount.intValue(), TEST_SQLITE_DATA_COUNT - SKIP_COUNT);
 	}

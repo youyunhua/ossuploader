@@ -19,35 +19,25 @@ public class Sqilte2OssUploader extends AbstractOssUploader {
 	
 	private static Logger logger = Logger.getLogger(App.class.getName());
 	
-	public Sqilte2OssUploader(DbInfo dbInfo, OssInfo ossInfo) {
-		this.dbInfo = dbInfo;
-		this.ossInfo = ossInfo;
+	public Sqilte2OssUploader(Context context) {
+		this.context = context;
 	}
 
 	@Override
 	public void run() {
 		logger.info("Sqilte2OssUploader run begin.");
 		try {
-			UploadResult uploadResult = UploadResultManager.readUploadResult("./");
-			
-			ExecutorService readExecutor = Executors.newSingleThreadExecutor();
-			int nThreads = App.config.getInt("thread.upload.count");
-			ExecutorService uploadExecutor = Executors.newFixedThreadPool(nThreads);
-			
-			SqliteReadTask readTask = new SqliteReadTask(this.dbInfo, uploadResult
-					, uploadExecutor, OssUploadTask.class, this.ossInfo);
-			Future<Integer> readCount = readExecutor.submit(readTask);
+			SqliteReadTask readTask = new SqliteReadTask(context);
+			Future<Integer> readCount = context.getReadExecutor().submit(readTask);
 			
 			logger.info("readCount=" + readCount.get());
-			readExecutor.shutdown();
-			readExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
+			context.getReadExecutor().shutdown();
+			context.getReadExecutor().awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
 			
-			uploadExecutor.shutdown();
-			uploadExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
+			context.getUploadExecutor().shutdown();
+			context.getUploadExecutor().awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
 			
 			logger.info("Sqilte2OssUploader run succeed.");
-		} catch (IOException e) {
-			logger.error("Sqilte2OssUploader run error.", e);
 		} catch (InterruptedException e) {
 			logger.warn("Interrupted.");
 			Thread.currentThread().interrupt();
@@ -58,6 +48,5 @@ public class Sqilte2OssUploader extends AbstractOssUploader {
 
     ///////////////////////////////////////////////////////////////
     // private properties and methods
-    private DbInfo dbInfo;
-    private OssInfo ossInfo;
+	private Context context;
 }
