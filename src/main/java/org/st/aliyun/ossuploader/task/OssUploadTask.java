@@ -2,14 +2,18 @@ package org.st.aliyun.ossuploader.task;
 
 
 import java.io.ByteArrayInputStream;
+import java.util.concurrent.ExecutorService;
 
 import org.apache.log4j.Logger;
+import org.st.aliyun.ossuploader.AbstractOssUploader;
+import org.st.aliyun.ossuploader.AbstractOssUploader.UploadObjectStatus;
 import org.st.aliyun.ossuploader.Context;
 import org.st.aliyun.ossuploader.OSSClientManager;
 import org.st.aliyun.ossuploader.model.OssInfo;
 import org.st.aliyun.ossuploader.model.UploadObject;
 import org.st.aliyun.ossuploader.util.GZipUtil;
 
+import com.aliyun.oss.ClientErrorCode;
 import com.aliyun.oss.ClientException;
 import com.aliyun.oss.OSSClient;
 import com.aliyun.oss.OSSErrorCode;
@@ -55,10 +59,41 @@ public class OssUploadTask extends UploadTask {
 			meta.setContentEncoding("gzip");
 		}
 
-		PutObjectResult result = client.putObject(bucketName, realKey, bis, meta);
+		try {
+			PutObjectResult result = client.putObject(bucketName, realKey, bis, meta);
+			
+			logger.info("OssUploadTask end. id=" + this.getUploadObject().getId()
+					+ ", key=" + this.getUploadObject().getKey()
+					+ ", etag=" + result.getETag());			
+		} catch (OSSException e) {
+			logger.error("OssUploadTask error: OSSException caught. msg=" + e.getErrorMessage() 
+					+ ", code=" + e.getErrorCode());
+			switch (e.getErrorCode()) {
+				case OSSErrorCode.NO_SUCH_BUCKET:
+					ExecutorService exe = this.getContext().getUploadExecutor();
+					if (exe != null) {
+						exe.shutdownNow();
+					}
+					AbstractOssUploader.uploadObjectStatusMap.put(this.getUploadObject().getId(), 
+							UploadObjectStatus.UploadError);
+					return null;
+				case OSSErrorCode.ACCESS_DENIED:
+				default:
+					throw e;
+			}
+		} catch (ClientException e) {
+			logger.error("OssUploadTask error: ClientException caught. msg=" + e.getErrorMessage() + 
+					", code=" + e.getErrorCode());
+			switch (e.getErrorCode()) {
+				case ClientErrorCode.UNKNOWN_HOST:
+					AbstractOssUploader.uploadObjectStatusMap.put(this.getUploadObject().getId(), 
+							UploadObjectStatus.UploadFailed);
+					return null;
+				default:
+					throw e;
+			}
 
-		logger.info("OssUploadTask end. id=" + this.getUploadObject().getId() + ", key="
-				+ this.getUploadObject().getKey() + ", etag=" + result.getETag());
+		}
 
 		return null;
 	}

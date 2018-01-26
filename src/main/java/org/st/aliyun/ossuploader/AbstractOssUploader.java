@@ -8,7 +8,8 @@ public abstract class AbstractOssUploader {
 			new ConcurrentHashMap<Integer, UploadObjectStatus>();
 	
 	public enum UploadObjectStatus {
-		ReadNotUpload, ReadFailed, Uploaded, UploadFailed
+		ReadNotUpload, ReadFailed, Uploaded, UploadFailed, 
+		UploadError,	// means context is invalid, should not try upload again
 	}
 
 	abstract void run();

@@ -15,7 +15,9 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.st.aliyun.ossuploader.AbstractOssUploader;
 import org.st.aliyun.ossuploader.Context;
+import org.st.aliyun.ossuploader.AbstractOssUploader.UploadObjectStatus;
 import org.st.aliyun.ossuploader.model.OssInfo;
 import org.st.aliyun.ossuploader.model.UploadObject;
 import org.st.aliyun.ossuploader.model.UploadResult;
@@ -65,6 +67,88 @@ public class OssUploadTaskTest {
 				null, null);
 		OssUploadTask task = new OssUploadTask(uploadObject, context);
 		task.call();
+	}
+
+	@Test
+	public void testCall_UnknownHost() throws Exception {
+		Integer objectId = 0;
+		UploadObject uploadObject = new UploadObject(objectId, "test", new byte[] {'a', 'b', 'd'});
+		ossInfo.setEndpoint("57a80b96-4e89-4735-92b4-85f08f5482d7.com");
+		ossInfo.setMaxErrorRetry(0);
+		Context context = new ContextMock(null, ossInfo, new UploadResult(), null, 
+				null, null);
+		OssUploadTask task = new OssUploadTask(uploadObject, context);
+		task.call();
+		assertEquals(UploadObjectStatus.UploadFailed, AbstractOssUploader.uploadObjectStatusMap.get(objectId));
+	}
+
+	@Test
+	public void testCall_NoSuchBucket() throws Exception {
+		Integer objectId = 0;
+		UploadObject uploadObject = new UploadObject(objectId, "test", new byte[] {'a', 'b', 'd'});
+		ossInfo.setBucket("57a80b96-4e89-4735-92b4-85f08f5482d7");
+		Context context = new ContextMock(null, ossInfo, new UploadResult(), null, 
+				null, null);
+		OssUploadTask task = new OssUploadTask(uploadObject, context);
+		task.call();
+		assertEquals(UploadObjectStatus.UploadError, AbstractOssUploader.uploadObjectStatusMap.get(objectId));
+	}
+
+	@Test
+	public void testCallByExecutor_NoSuchBucket() throws Exception {
+		Integer objectId = 0;
+		UploadObject uploadObject = new UploadObject(objectId, "test", new byte[] {'a', 'b', 'd'});
+		ossInfo.setBucket("57a80b96-4e89-4735-92b4-85f08f5482d7");
+		ExecutorService uploadExecutor = Executors.newSingleThreadExecutor();
+		Context context = new ContextMock(null, ossInfo, new UploadResult(), null, 
+				uploadExecutor, null);
+		OssUploadTask task = new OssUploadTask(uploadObject, context);
+		uploadExecutor.submit(task);
+		assertTrue(uploadExecutor.awaitTermination(10000L, TimeUnit.MILLISECONDS));
+		
+		assertTrue(uploadExecutor.isShutdown()); 
+		assertEquals(UploadObjectStatus.UploadError, AbstractOssUploader.uploadObjectStatusMap.get(objectId));
+	}
+
+	@Test
+	public void testCallBySingleExecutor_NoSuchBucket() throws Exception {
+		ossInfo.setBucket("57a80b96-4e89-4735-92b4-85f08f5482d7");
+		ExecutorService uploadExecutor = Executors.newSingleThreadExecutor();
+		Context context = new ContextMock(null, ossInfo, new UploadResult(), null, 
+				uploadExecutor, null);
+		for (Integer i = 0; i < 10000; ++i) {
+			UploadObject uploadObject = new UploadObject(i, i.toString(), new byte[] {'a', 'b', 'd'});
+			OssUploadTask task = new OssUploadTask(uploadObject, context);
+			uploadExecutor.submit(task);			
+		}
+		System.out.println("tasks all submited.");
+		assertTrue(uploadExecutor.awaitTermination(10000L, TimeUnit.MILLISECONDS));
+		
+		assertTrue(uploadExecutor.isShutdown()); 
+		assertEquals(1, AbstractOssUploader.uploadObjectStatusMap.size());
+		assertEquals(UploadObjectStatus.UploadError, AbstractOssUploader.uploadObjectStatusMap.get(0));
+	}
+
+	@Test
+	public void testCallByFixedExecutor_NoSuchBucket() throws Exception {
+		ossInfo.setBucket("57a80b96-4e89-4735-92b4-85f08f5482d7");
+		int nThreads = 10;
+		ExecutorService uploadExecutor = Executors.newFixedThreadPool(nThreads);
+		Context context = new ContextMock(null, ossInfo, new UploadResult(), null, 
+				uploadExecutor, null);
+		for (Integer i = 0; i < 10000; ++i) {
+			UploadObject uploadObject = new UploadObject(i, i.toString(), new byte[] {'a', 'b', 'd'});
+			OssUploadTask task = new OssUploadTask(uploadObject, context);
+			uploadExecutor.submit(task);			
+		}
+		System.out.println("tasks all submited.");
+		assertTrue(uploadExecutor.awaitTermination(10000L, TimeUnit.MILLISECONDS));
+		
+		assertTrue(uploadExecutor.isShutdown()); 
+		int mapSize = AbstractOssUploader.uploadObjectStatusMap.size();
+		assertEquals(nThreads, mapSize);
+		assertTrue(1 <= mapSize);
+		assertTrue(nThreads >= mapSize);
 	}
 
 }
