@@ -87,7 +87,7 @@ public class ContextImpl implements Context {
 
 	@Override
 	public UploadTask newUploadTask(UploadObject uploadObject) {
-		return new OssUploadTask(uploadObject, ossInfo);
+		return new OssUploadTask(uploadObject, this);
 	}
 
 }

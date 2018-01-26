@@ -2,25 +2,25 @@ package org.st.aliyun.ossuploader.task;
 
 import java.util.concurrent.Callable;
 
-import org.st.aliyun.ossuploader.model.OssInfo;
+import org.st.aliyun.ossuploader.Context;
 import org.st.aliyun.ossuploader.model.UploadObject;
 
 public abstract class UploadTask implements Callable<Object>{
 	
 	private final UploadObject uploadObject;
-	private final OssInfo ossInfo;
+	private final Context context;
 	
-	public UploadTask(UploadObject uploadObject, OssInfo ossInfo) {
+	public UploadTask(UploadObject uploadObject, Context context) {
 		this.uploadObject = uploadObject;
-		this.ossInfo = ossInfo;
+		this.context = context;
 	}
 
 	public UploadObject getUploadObject() {
 		return uploadObject;
 	}
 
-	public OssInfo getOssInfo() {
-		return ossInfo;
-	}
+	public Context getContext() {
+		return context;
+	}	
 
 }
