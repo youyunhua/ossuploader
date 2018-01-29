@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.RejectedExecutionException;
 
 import org.apache.log4j.Logger;
 import org.st.aliyun.ossuploader.AbstractOssUploader;
@@ -69,17 +70,18 @@ public class SqliteReadTask implements Callable<Integer> {
 				} catch (SQLException e) {
 					logger.error(id + ": ReadSqliteTask get data error.", e);
 					AbstractOssUploader.uploadObjectStatusMap.put(id, UploadObjectStatus.ReadFailed);
-				} finally {
+				} catch (RejectedExecutionException e) {
+					logger.error(id + ": UploadExecutor has shutdown.", e);
+					break;
+				}
+				finally {
 					++id;
 					++totalReadCount;
 				}
 			} ;
 
-//			UploadTask poisonPillTask = UploadTasks.newUploadTask(UploadConstants.UPLOAD_OBJECT_POISON_PILL, 
-//					this.ossInfo, this.uploadTaskClass);
-//			this.uploadExecutor.submit(poisonPillTask);
-			UploadTask poisonPillTask = this.context.newUploadTask(UploadConstants.UPLOAD_OBJECT_POISON_PILL);
-			this.context.getUploadExecutor().submit(poisonPillTask);
+//			UploadTask poisonPillTask = this.context.newUploadTask(UploadConstants.UPLOAD_OBJECT_POISON_PILL);
+//			this.context.getUploadExecutor().submit(poisonPillTask);
 
 			this.context.getUploadResult().setCurrentReadId(id);
 			this.context.getUploadResult().setTotalReadSize(totalReadSize);
