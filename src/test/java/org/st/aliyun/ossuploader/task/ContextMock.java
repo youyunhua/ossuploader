@@ -59,8 +59,7 @@ public class ContextMock implements Context {
 
 	@Override
 	public UploadTask newUploadTask(UploadObject uploadObject) {
-		return UploadTasks.newUploadTask(uploadObject, this.ossInfo,
-				this.uploadTaskClass);
+		return UploadTasks.newUploadTask(uploadObject, this);
 	}
 
 }
