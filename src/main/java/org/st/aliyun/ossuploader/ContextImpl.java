@@ -11,6 +11,9 @@ import org.st.aliyun.ossuploader.model.UploadResult;
 import org.st.aliyun.ossuploader.task.OssUploadTask;
 import org.st.aliyun.ossuploader.task.UploadTask;
 
+import com.aliyun.oss.ClientConfiguration;
+import com.aliyun.oss.OSSClient;
+
 public class ContextImpl implements Context {
 	
 	private static Logger logger = Logger.getLogger(ContextImpl.class.getName());
@@ -20,6 +23,7 @@ public class ContextImpl implements Context {
 	private UploadResult uploadResult;
 	private ExecutorService readExecutor;
 	private ExecutorService uploadExecutor;
+	private OSSClient ossClient;
 
 	public ContextImpl(ExecutorService readExecutor, ExecutorService uploadExecutor) {
 		init();
@@ -46,6 +50,14 @@ public class ContextImpl implements Context {
 		ossInfo.setMaxConnections(App.config.getInteger("oss.maxConnections", 100));
 		ossInfo.setMaxErrorRetry(App.config.getInteger("oss.maxErrorRetry", 10));
 		
+        ClientConfiguration conf = new ClientConfiguration();
+        conf.setMaxConnections(ossInfo.getMaxConnections());
+        conf.setConnectionTimeout(ossInfo.getConnectionTimeOut());
+        conf.setMaxErrorRetry(ossInfo.getMaxErrorRetry());
+        conf.setSocketTimeout(ossInfo.getSocketTimeOut());
+        ossClient = new OSSClient(ossInfo.getEndpoint(), ossInfo.getKey(), 
+        		ossInfo.getSecret(), conf);
+
 		try {
 			uploadResult = UploadResultManager.readUploadResult("./");
 		} catch (IOException e) {
@@ -88,6 +100,11 @@ public class ContextImpl implements Context {
 	@Override
 	public UploadTask newUploadTask(UploadObject uploadObject) {
 		return new OssUploadTask(uploadObject, this);
+	}
+
+	@Override
+	public OSSClient getOssClient() {
+		return this.ossClient;
 	}
 
 }

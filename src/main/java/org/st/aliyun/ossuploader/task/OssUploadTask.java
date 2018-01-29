@@ -8,7 +8,6 @@ import org.apache.log4j.Logger;
 import org.st.aliyun.ossuploader.AbstractOssUploader;
 import org.st.aliyun.ossuploader.AbstractOssUploader.UploadObjectStatus;
 import org.st.aliyun.ossuploader.Context;
-import org.st.aliyun.ossuploader.OSSClientManager;
 import org.st.aliyun.ossuploader.model.OssInfo;
 import org.st.aliyun.ossuploader.model.UploadObject;
 import org.st.aliyun.ossuploader.util.GZipUtil;
@@ -37,7 +36,6 @@ public class OssUploadTask extends UploadTask {
 		logger.info("OssUploadTask begin. id=" + this.getUploadObject().getId()
 				+ ", key=" + this.getUploadObject().getKey());
 		
-		OSSClient client = OSSClientManager.getOSSClient(this.getContext().getOssInfo());
 		String bucketName = this.getContext().getOssInfo().getBucket();
 		String urlPrefix = this.getContext().getOssInfo().getPrefix();
 		String realKey = urlPrefix + this.getUploadObject().getKey();
@@ -60,19 +58,23 @@ public class OssUploadTask extends UploadTask {
 		}
 
 		try {
-			PutObjectResult result = client.putObject(bucketName, realKey, bis, meta);
+			PutObjectResult result = this.getContext().getOssClient().putObject(
+					bucketName, realKey, bis, meta);
 			
 			logger.info("OssUploadTask end. id=" + this.getUploadObject().getId()
 					+ ", key=" + this.getUploadObject().getKey()
 					+ ", etag=" + result.getETag());			
 		} catch (OSSException e) {
-			logger.error("OssUploadTask error: OSSException caught. msg=" + e.getErrorMessage() 
-					+ ", code=" + e.getErrorCode());
+			logger.error("OssUploadTask error: OSSException caught. id=" + this.getUploadObject().getId()
+					+ ", msg=" + e.getErrorMessage() + ", code=" + e.getErrorCode());
 			switch (e.getErrorCode()) {
 				case OSSErrorCode.NO_SUCH_BUCKET:
 					ExecutorService exe = this.getContext().getUploadExecutor();
 					if (exe != null) {
 						exe.shutdownNow();
+						logger.error("Shut down UploadExecutor.");
+						// make work threads fast-fail 
+						this.getContext().getOssClient().shutdown();
 					}
 					AbstractOssUploader.uploadObjectStatusMap.put(this.getUploadObject().getId(), 
 							UploadObjectStatus.UploadError);
@@ -82,13 +84,14 @@ public class OssUploadTask extends UploadTask {
 					throw e;
 			}
 		} catch (ClientException e) {
-			logger.error("OssUploadTask error: ClientException caught. msg=" + e.getErrorMessage() + 
-					", code=" + e.getErrorCode());
+			logger.error("OssUploadTask error: ClientException caught. id=" + this.getUploadObject().getId()
+					+ ", msg=" + e.getErrorMessage() + ", code=" + e.getErrorCode());
 			switch (e.getErrorCode()) {
-				case ClientErrorCode.UNKNOWN_HOST:
+				case ClientErrorCode.UNKNOWN_HOST:	// when host not exit or not connected
 					AbstractOssUploader.uploadObjectStatusMap.put(this.getUploadObject().getId(), 
 							UploadObjectStatus.UploadFailed);
 					return null;
+				case ClientErrorCode.UNKNOWN:	// show this exception when OSSClient has shut down
 				default:
 					throw e;
 			}
@@ -97,6 +100,4 @@ public class OssUploadTask extends UploadTask {
 
 		return null;
 	}
-
-
 }
