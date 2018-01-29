@@ -8,13 +8,11 @@ import org.apache.log4j.Logger;
 import org.st.aliyun.ossuploader.AbstractOssUploader;
 import org.st.aliyun.ossuploader.AbstractOssUploader.UploadObjectStatus;
 import org.st.aliyun.ossuploader.Context;
-import org.st.aliyun.ossuploader.model.OssInfo;
 import org.st.aliyun.ossuploader.model.UploadObject;
 import org.st.aliyun.ossuploader.util.GZipUtil;
 
 import com.aliyun.oss.ClientErrorCode;
 import com.aliyun.oss.ClientException;
-import com.aliyun.oss.OSSClient;
 import com.aliyun.oss.OSSErrorCode;
 import com.aliyun.oss.OSSException;
 import com.aliyun.oss.model.ObjectMetadata;
@@ -69,13 +67,7 @@ public class OssUploadTask extends UploadTask {
 					+ ", msg=" + e.getErrorMessage() + ", code=" + e.getErrorCode());
 			switch (e.getErrorCode()) {
 				case OSSErrorCode.NO_SUCH_BUCKET:
-					ExecutorService exe = this.getContext().getUploadExecutor();
-					if (exe != null) {
-						exe.shutdownNow();
-						logger.error("Shut down UploadExecutor.");
-						// make work threads fast-fail 
-						this.getContext().getOssClient().shutdown();
-					}
+					shutdown();
 					AbstractOssUploader.uploadObjectStatusMap.put(this.getUploadObject().getId(), 
 							UploadObjectStatus.UploadError);
 					return null;
@@ -90,6 +82,7 @@ public class OssUploadTask extends UploadTask {
 				case ClientErrorCode.UNKNOWN_HOST:	// when host not exit or not connected
 					AbstractOssUploader.uploadObjectStatusMap.put(this.getUploadObject().getId(), 
 							UploadObjectStatus.UploadFailed);
+					shutdown();
 					return null;
 				case ClientErrorCode.UNKNOWN:	// show this exception when OSSClient has shut down
 				default:
@@ -99,5 +92,15 @@ public class OssUploadTask extends UploadTask {
 		}
 
 		return null;
+	}
+	
+	private void shutdown() {
+		ExecutorService exe = this.getContext().getUploadExecutor();
+		if (exe != null) {
+			exe.shutdownNow();
+			logger.error("Shut down UploadExecutor.");
+			// make work threads fast-fail 
+			this.getContext().getOssClient().shutdown();
+		}
 	}
 }
