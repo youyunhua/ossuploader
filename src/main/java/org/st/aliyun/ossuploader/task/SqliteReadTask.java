@@ -1,13 +1,11 @@
 package org.st.aliyun.ossuploader.task;
 
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionException;
 
 import org.apache.log4j.Logger;
@@ -15,11 +13,7 @@ import org.st.aliyun.ossuploader.AbstractOssUploader;
 import org.st.aliyun.ossuploader.UploadResultManager;
 import org.st.aliyun.ossuploader.AbstractOssUploader.UploadObjectStatus;
 import org.st.aliyun.ossuploader.Context;
-import org.st.aliyun.ossuploader.constant.UploadConstants;
-import org.st.aliyun.ossuploader.model.DbInfo;
-import org.st.aliyun.ossuploader.model.OssInfo;
 import org.st.aliyun.ossuploader.model.UploadObject;
-import org.st.aliyun.ossuploader.model.UploadResult;
 
 public class SqliteReadTask implements Callable<Integer> {
 
@@ -62,9 +56,6 @@ public class SqliteReadTask implements Callable<Integer> {
 					uploadObject = new UploadObject(id, tileKey, tileData);
 					AbstractOssUploader.uploadObjectStatusMap.put(id, UploadObjectStatus.ReadNotUpload);
 					
-//					UploadTask uploadTask = UploadTasks.newUploadTask(uploadObject, this.ossInfo,
-//							this.uploadTaskClass);
-//					this.uploadExecutor.submit(uploadTask);
 					UploadTask uploadTask = this.context.newUploadTask(uploadObject);
 					this.context.getUploadExecutor().submit(uploadTask);
 				} catch (SQLException e) {
