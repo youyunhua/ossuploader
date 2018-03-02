@@ -90,48 +90,65 @@ public class DbInfo {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		DbInfo other = (DbInfo) obj;
 		if (host == null) {
-			if (other.host != null)
+			if (other.host != null) {
 				return false;
-		} else if (!host.equals(other.host))
+			}
+		} else if (!host.equals(other.host)) {
 			return false;
+		}
 		if (keyField == null) {
-			if (other.keyField != null)
+			if (other.keyField != null) {
 				return false;
-		} else if (!keyField.equals(other.keyField))
+			}
+		} else if (!keyField.equals(other.keyField)) {
 			return false;
+		}
 		if (name == null) {
-			if (other.name != null)
+			if (other.name != null) {
 				return false;
-		} else if (!name.equals(other.name))
+			}
+		} else if (!name.equals(other.name)) {
 			return false;
+		}
 		if (port == null) {
-			if (other.port != null)
+			if (other.port != null) {
 				return false;
-		} else if (!port.equals(other.port))
+			}
+		} else if (!port.equals(other.port)) {
 			return false;
+		}
 		if (table == null) {
-			if (other.table != null)
+			if (other.table != null) {
 				return false;
-		} else if (!table.equals(other.table))
+			}
+		} else if (!table.equals(other.table)) {
 			return false;
+		}
 		if (user == null) {
-			if (other.user != null)
+			if (other.user != null) {
 				return false;
-		} else if (!user.equals(other.user))
+			}
+		} else if (!user.equals(other.user)) {
 			return false;
+		}
 		if (valueField == null) {
-			if (other.valueField != null)
+			if (other.valueField != null) {
 				return false;
-		} else if (!valueField.equals(other.valueField))
+			}
+		} else if (!valueField.equals(other.valueField)) {
 			return false;
+		}
 		return true;
 	}
 

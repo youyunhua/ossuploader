@@ -39,8 +39,9 @@ public class Utils {
 	// get all files recursively
 	public static List<File> getFiles(List<File> files, File dir)
 	{
-	    if (files == null)
-	        files = new ArrayList<File>();
+	    if (files == null) {
+			files = new ArrayList<File>();
+		}
 
 	    if (!dir.isDirectory())
 	    {
@@ -50,8 +51,9 @@ public class Utils {
 	        return files;
 	    }
 
-	    for (File file : dir.listFiles())
-	    	getFiles(files, file);
+	    for (File file : dir.listFiles()) {
+			getFiles(files, file);
+		}
 	    return files;
 	}
 	

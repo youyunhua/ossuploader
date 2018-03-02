@@ -128,63 +128,86 @@ public class UploadResult {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		UploadResult other = (UploadResult) obj;
 		if (currentReadId == null) {
-			if (other.currentReadId != null)
+			if (other.currentReadId != null) {
 				return false;
-		} else if (!currentReadId.equals(other.currentReadId))
+			}
+		} else if (!currentReadId.equals(other.currentReadId)) {
 			return false;
+		}
 		if (dbInfo == null) {
-			if (other.dbInfo != null)
+			if (other.dbInfo != null) {
 				return false;
-		} else if (!dbInfo.equals(other.dbInfo))
+			}
+		} else if (!dbInfo.equals(other.dbInfo)) {
 			return false;
+		}
 		if (lastUpdateTime == null) {
-			if (other.lastUpdateTime != null)
+			if (other.lastUpdateTime != null) {
 				return false;
-		} else if (!lastUpdateTime.equals(other.lastUpdateTime))
+			}
+		} else if (!lastUpdateTime.equals(other.lastUpdateTime)) {
 			return false;
+		}
 		if (ossInfo == null) {
-			if (other.ossInfo != null)
+			if (other.ossInfo != null) {
 				return false;
-		} else if (!ossInfo.equals(other.ossInfo))
+			}
+		} else if (!ossInfo.equals(other.ossInfo)) {
 			return false;
+		}
 		if (readButNotUploadIds == null) {
-			if (other.readButNotUploadIds != null)
+			if (other.readButNotUploadIds != null) {
 				return false;
-		} else if (!readButNotUploadIds.equals(other.readButNotUploadIds))
+			}
+		} else if (!readButNotUploadIds.equals(other.readButNotUploadIds)) {
 			return false;
+		}
 		if (readFailedIds == null) {
-			if (other.readFailedIds != null)
+			if (other.readFailedIds != null) {
 				return false;
-		} else if (!readFailedIds.equals(other.readFailedIds))
+			}
+		} else if (!readFailedIds.equals(other.readFailedIds)) {
 			return false;
+		}
 		if (readOvered == null) {
-			if (other.readOvered != null)
+			if (other.readOvered != null) {
 				return false;
-		} else if (!readOvered.equals(other.readOvered))
+			}
+		} else if (!readOvered.equals(other.readOvered)) {
 			return false;
+		}
 		if (totalReadSize == null) {
-			if (other.totalReadSize != null)
+			if (other.totalReadSize != null) {
 				return false;
-		} else if (!totalReadSize.equals(other.totalReadSize))
+			}
+		} else if (!totalReadSize.equals(other.totalReadSize)) {
 			return false;
+		}
 		if (totalUploadSize == null) {
-			if (other.totalUploadSize != null)
+			if (other.totalUploadSize != null) {
 				return false;
-		} else if (!totalUploadSize.equals(other.totalUploadSize))
+			}
+		} else if (!totalUploadSize.equals(other.totalUploadSize)) {
 			return false;
+		}
 		if (uploadFailedIds == null) {
-			if (other.uploadFailedIds != null)
+			if (other.uploadFailedIds != null) {
 				return false;
-		} else if (!uploadFailedIds.equals(other.uploadFailedIds))
+			}
+		} else if (!uploadFailedIds.equals(other.uploadFailedIds)) {
 			return false;
+		}
 		return true;
 	}
 

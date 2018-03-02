@@ -72,8 +72,9 @@ public class UploadResultManager {
 
 		// first read db
 		TreeSet<Integer> ids = uploadResult.getReadButNotUploadIds();
-		if (ids == null) 
+		if (ids == null) {
 			return -1;
+		}
 		
 		TreeSet<Integer> readFailedIds = uploadResult.getReadFailedIds();
 		if (uploadResult.getReadOvered()) {

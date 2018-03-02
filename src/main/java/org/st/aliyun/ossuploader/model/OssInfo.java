@@ -106,38 +106,51 @@ public class OssInfo {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		OssInfo other = (OssInfo) obj;
 		if (bucket == null) {
-			if (other.bucket != null)
+			if (other.bucket != null) {
 				return false;
-		} else if (!bucket.equals(other.bucket))
+			}
+		} else if (!bucket.equals(other.bucket)) {
 			return false;
+		}
 		if (connectionTimeOut == null) {
-			if (other.connectionTimeOut != null)
+			if (other.connectionTimeOut != null) {
 				return false;
-		} else if (!connectionTimeOut.equals(other.connectionTimeOut))
+			}
+		} else if (!connectionTimeOut.equals(other.connectionTimeOut)) {
 			return false;
+		}
 		if (endpoint == null) {
-			if (other.endpoint != null)
+			if (other.endpoint != null) {
 				return false;
-		} else if (!endpoint.equals(other.endpoint))
+			}
+		} else if (!endpoint.equals(other.endpoint)) {
 			return false;
+		}
 		if (port == null) {
-			if (other.port != null)
+			if (other.port != null) {
 				return false;
-		} else if (!port.equals(other.port))
+			}
+		} else if (!port.equals(other.port)) {
 			return false;
+		}
 		if (prefix == null) {
-			if (other.prefix != null)
+			if (other.prefix != null) {
 				return false;
-		} else if (!prefix.equals(other.prefix))
+			}
+		} else if (!prefix.equals(other.prefix)) {
 			return false;
+		}
 		return true;
 	}
 
