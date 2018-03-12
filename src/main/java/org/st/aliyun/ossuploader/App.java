@@ -59,11 +59,11 @@ public class App
 		AbstractOssUploader uploader = null;
 		
 		if (Objects.equals(dbType, "sqlite")) {
+			int nWorkQueueCapacity = App.config.getInt("thread.upload.queuecapacity");
 			ExecutorService readExecutor = new ThreadPoolExecutor(1, 1,
                     0L, TimeUnit.MILLISECONDS,
-                    new LinkedBlockingQueue<Runnable>());
+                    new LinkedBlockingQueue<Runnable>(nWorkQueueCapacity));
 			int nThreads = App.config.getInt("thread.upload.count");
-			int nWorkQueueCapacity = App.config.getInt("thread.upload.queuecapacity");
 			ExecutorService uploadExecutor = new ThreadPoolExecutor(nThreads, nThreads,
                     0L, TimeUnit.MILLISECONDS,
                     new LinkedBlockingQueue<Runnable>(nWorkQueueCapacity));
