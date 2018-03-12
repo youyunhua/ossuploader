@@ -15,11 +15,11 @@ import org.st.aliyun.ossuploader.model.UploadResult;
 import org.st.aliyun.ossuploader.task.OssUploadTask;
 import org.st.aliyun.ossuploader.task.SqliteReadTask;
 
-public class Sqilte2OssUploader extends AbstractOssUploader {
+public class Sqlite2OssUploader extends AbstractOssUploader {
 	
 	private static Logger logger = Logger.getLogger(App.class.getName());
 	
-	public Sqilte2OssUploader(Context context) {
+	public Sqlite2OssUploader(Context context) {
 		this.context = context;
 	}
 

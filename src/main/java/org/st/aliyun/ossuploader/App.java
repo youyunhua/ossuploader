@@ -68,7 +68,7 @@ public class App
                     0L, TimeUnit.MILLISECONDS,
                     new LinkedBlockingQueue<Runnable>(nWorkQueueCapacity));
 			Context context = new ContextImpl(readExecutor, uploadExecutor);
-			uploader = new Sqilte2OssUploader(context);
+			uploader = new Sqlite2OssUploader(context);
 		}
 		
 		return uploader;
