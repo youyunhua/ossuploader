@@ -27,6 +27,8 @@ public class Sqilte2OssUploader extends AbstractOssUploader {
 	public void run() {
 		logger.info("Sqilte2OssUploader run begin.");
 		try {
+			Class.forName("org.sqlite.JDBC");
+			 
 			SqliteReadTask readTask = new SqliteReadTask(context);
 			Future<Integer> readCount = context.getReadExecutor().submit(readTask);
 			
@@ -38,6 +40,8 @@ public class Sqilte2OssUploader extends AbstractOssUploader {
 			context.getUploadExecutor().awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
 			
 			logger.info("Sqilte2OssUploader run succeed.");
+		} catch (ClassNotFoundException e) {
+			logger.warn("Sqlite JDBC driver not found.");
 		} catch (InterruptedException e) {
 			logger.warn("Interrupted.");
 			Thread.currentThread().interrupt();
